@@ -1,0 +1,166 @@
+
+###################################################
+#######>>>>>>>>>>  3DPrintDemon  <<<<<<<<<<<#######
+#######   https://github.com/3DPrintDemon   #######
+
+# IF YOU USE & LIKE THESE MACROS PLEASE CONSIDER SUPPORTING MY EFFORTS AT 
+# https://www.buymeacoffee.com/3dprintdemon 
+
+########################## VERY IMPORTANT ###############################
+#########################################################################
+# FOR THIS TO WORK!!!
+# YOU MUST DO THIS!!!
+# ADD THE 3 LINES BELOW TO PRUSASLICER'S OR ORCA SLICER'S START GCODE SECTION
+
+# M104 S0 
+# M140 S0
+# print_start EXTRUDER=[first_layer_temperature[initial_extruder]] BED=[first_layer_bed_temperature] HEIGHT=[first_layer_height] LAYER=[layer_height] FILAMENT=[filament_type] 
+
+#########################################################################
+### IF YOU USE CURA ### 
+# ADD THE 3 LINES BELOW TO CURA SLICER'S START GCODE SECTION, BUT YOU WILL ALSO NEED TO MAKE CHANGES TO THE MACROS THEMSELVES - SORRY :-{
+
+# M109 S0
+# M190 S0
+# print_start EXTRUDER={material_print_temperature_layer_0} BED={material_bed_temperature_layer_0} HEIGHT={layer_height_0} LAYER={layer_height} FILAMENT={material_type}
+
+#########################################################################
+# BE SURE TO DELETE THE HASH "#" AT THE LINE START IN YOUR SLICER OR IT WONT WORK
+# Your slicer's Start G-Code box most only contain those 3 lines above, plus the Mainsail layer count command - see the Mailsail website's slicer section.
+# Then you will also need to modify all instances of 'PET' & 'FLEX' in the macros to 'PETG' & 'TPU 95A'. Also do not use Cura's 'PLA+' setting, Just use 'PLA'.
+# Yes, I know its a hassle...
+# But tbh, why are you still using Cura?! lol ;-p
+#########################################################################
+
+# Also be sure to add the line below in your slicer's End G-Code box
+
+# PRINT_END
+
+#########################################################################
+# BE SURE TO DELETE THE HASH "#" AT THE LINE START IN YOUR SLICER OR IT WONT WORK
+# Your slicer's End G-Code box must only contain that line above
+#########################################################################
+
+
+
+############# YOU'LL NEED THIS!!!! ###############
+# DOWNLOAD THE HEAT SOAK TIMERS .CFG HERE >>>> https://github.com/3DPrintDemon/Non_Blocking_Wait_Sovol/releases/tag/Heat_Soak_Timers_V1.0
+# You can add a spare or empty pin on your board if you dont have any actual LED's, it'll still work.
+
+
+
+#########################################################################
+# BEFORE FIRST USE
+#########################################################################
+
+# CHECK YOUR VALUES ARE CORRECT BEFORE USE, THIS IS VITAL & TOTALLY ON YOU!
+
+# DO NOT BLINDLY USE THESE DEFAULTS!!
+
+# USE THESE MACROS AT YOUR OWN RISK! 
+
+# DONT CRY TO ME IF YOU DIDN'T CHECK/CHANGE VALUES & YOU BREAK THINGS!
+
+# >>>>>>>>>>>>>>>>>>>>>>>>>!!WARNING!!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# THIS START CODE USES RELATIVE EXTRUSION!! SET IT IN YOUR SLICER!
+
+
+################ IMPORTANT!!! BUILD NEW BED MESHES WITH THE BED AT THE TEMPS YOU PRINT AT FOR EACH TYPE OF FILAMENT LIST BELOW! ###################
+##################################### ALLOW TO HEAT SOAK 10-15 MINUTES THEN HOME BEFORE BUILDING MESH!! ###########################################
+########################################### BUILD & STORE 5 MESHES TOTAL INCLUDING YOUR DEFAULT ###################################################
+################################################ DO NOT OVERWRITE YOUR "DEFAULT" MESH!!! ##########################################################
+
+
+################################################## CHANGE YOUR START PRINT VALUES HERE!! ##########################################################
+###################################################################################################################################################
+
+[gcode_macro _START_VARIABLES]
+
+## PLA VARIABLES ##################################################################################################################################
+variable_pla_flow_rate: 98                       # Tune your flow rate for layers under 0.25mm
+variable_pla_hi_flow_rate: 99                    # Tune your flow rate for layers 0.26mm & over
+variable_pla_noz_pre: 180                        # Set Nozzle Pre Heat Temp
+variable_pla_chamber_temp: 22                    # Temp above which Chamber Cooling fan activtes 
+variable_pla_pa: 0.03                           # Set Pressure Advance Value
+variable_pla_st: 0.04                            # Set Smooth Time value
+
+## ASA VARIABLES ##################################################################################################################################
+variable_asa_flow_rate: 90                       # Tune your flow rate for layers under 0.25mm
+variable_asa_hi_flow_rate: 94                    # Tune your flow rate for layers 0.26mm & over
+variable_asa_noz_pre: 190                        # Set Nozzle Pre Heat Temp
+variable_asa_chamber_temp: 50                    # Temp above which Chamber Cooling fan activtes
+variable_asa_pa: 0.03                           # Set Pressure Advance Value
+variable_asa_st: 0.04                            # Set Smooth Time value
+
+## ABS VARIABLES ##################################################################################################################################
+variable_abs_flow_rate: 90                       # Tune your flow rate for layers under 0.26mm
+variable_abs_hi_flow_rate: 94                    # Tune your flow rate for layers over 0.26mm
+variable_abs_noz_pre: 190                        # Set Nozzle Pre Heat Temp
+variable_abs_chamber_temp: 50                    # Temp above which Chamber Cooling fan activtes
+variable_abs_pa: 0.03                           # Set Pressure Advance Value
+variable_abs_st: 0.04                            # Set Smooth Time value
+
+## ASA & ABS ADDITIONAL ###########################################################################################################################
+variable_high_temp_expansion_offset: False        # Adjust Z offset for high temperture thermal expansion True/False
+variable_high_temp_offset: -0.005                # Use with EXTREME caution!! Manual G-Code Z offset override!    Use a negative offset here!
+                                                 # NOTE: Range of -0.05mm to +0.05mm max adjustment, anything more will cause EMERGENCY STOP
+## PETG VARIABLES #################################################################################################################################
+variable_petg_flow_rate: 98                      # Tune your flow rate for layers under 0.26mm
+variable_petg_hi_flow_rate: 100                  # Tune your flow rate for layers over 0.26mm
+variable_petg_noz_pre: 180                       # Set Nozzle Pre Heat Temp
+variable_petg_chamber_temp: 35                   # Temp above which Chamber Cooling fan activtes
+variable_petg_pa: 0.03                          # Set Pressure Advance Value
+variable_petg_st: 0.04                           # Set Smooth Time value
+
+## PETG ADDITIONAL ################################################################################################################################
+variable_petg_anti_squish: False                  # Adjsut Z offset for reduced Squish when using PETG True/False
+variable_petg_offset: 0.030                      # Use with EXTREME caution!! Manual G-Code Z offset override!    Use a positive offset here!
+                                                 # NOTE: Range of 0.00 to +0.05mm max adjustment, anything outside this will cause EMERGENCY STOP
+## TPU VARIABLES ##################################################################################################################################
+variable_tpu_flow_rate: 98                       # Tune your flow rate for layers under 0.26mm
+variable_tpu_hi_flow_rate: 100                   # Tune your flow rate for layers over 0.26mm
+variable_tpu_noz_pre: 180                        # Set Nozzle Pre Heat Temp
+variable_tpu_chamber_temp: 25                    # Temp above which Chamber Cooling fan activtes
+variable_tpu_pa: 0.03                           # Set Pressure Advance Value
+variable_tpu_st: 0.04                            # Set Smooth Time value
+
+## TIMERS & THRESHOLDS ############################################################################################################################
+variable_lo_temp_timer: 1                       # Set PLA bed heat soak timer
+variable_hi_temp_timer: 2                       # Set ASA bed heat soak timer
+variable_lo_heat_soak_threshold: 22              # Temp over which Chamber is not heat soaked
+variable_hi_heat_soak_threshold: 35              # Temp over which Chamber is not heat soaked
+
+## DEFAULT VALUES FOR UNASSIGNED PROFILES #########################################################################################################
+variable_default_lo_noz_pre: 180                 # Set Nozzle Pre Heat Temp
+variable_default_hi_noz_pre: 200                 # Set Nozzle Pre Heat Temp
+variable_default_chamber_temp: 25                # Temp above which Chamber Cooling fan activtes 
+variable_default_temp_timer: 3                  # Set PLA bed heat soak timer
+variable_default_heat_soak_threshold: 22         # Temp over which Chamber is not heat soaked
+
+## OTHER #########################################################################################################################################
+variable_feed_rate: 100                          # Default Print Feed Rate
+
+## PRINTER HARDWARE OPTIONS ######################################################################################################################
+variable_five_drivers: True                      # Does your printer have 5 stepper drivers (SV07/07+) True/False
+variable_chamber_fan: False                      # Do you have a Chamber cooling fan True/False
+variable_chamber_sensor: False                   # Do you have a temperature monitoring sensor in your chamber True/False
+variable_runout_sensor: False                     # Do you have a Filament Runout Sensor True/False
+variable_shutdown_relay: False                    # Do you have a Moonraker Power Device Shutdown Relay True/False
+
+## NOTE: To use both chamber_fan & chamber_sensor together you must enable duplicate_pin_override for your sensor pin in your printer.cfg
+
+##################################################################################################################################################
+gcode:                                           # Leave this section empty!
+##################################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
